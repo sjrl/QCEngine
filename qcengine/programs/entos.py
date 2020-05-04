@@ -135,7 +135,7 @@ class EntosHarness(ProgramHarness):
         self.found(raise_error=True)
 
         # Check entos version
-        if parse_version(self.get_version()) < parse_version("0.7.1"):
+        if parse_version(self.get_version()) < parse_version("0.8.0"):
             raise TypeError(f"entos version {self.get_version()} not supported")
 
         # Setup the job
@@ -262,7 +262,6 @@ class EntosHarness(ProgramHarness):
 
             # Write input file
             input_file = [
-                f"entos_policy(version = '{self.get_version()}')",
                 "json_results := ",
             ] + self.write_input_recursive(input_dict)
             input_file = "\n".join(input_file)
@@ -287,7 +286,7 @@ class EntosHarness(ProgramHarness):
             input_file = str_template.substitute()
 
         return {
-            "commands": ["entos", "-n", str(config.ncores), "-o", "dispatch.out", "--json-results", "dispatch.in"],
+            "commands": ["entos", "-n", str(config.ncores), "-o", "dispatch.out", "-f", "json", "dispatch.in"],
             "infiles": {"dispatch.in": input_file, "geometry.xyz": xyz_file},
             "scratch_directory": config.scratch_directory,
             "input_result": input_model.copy(deep=True),
@@ -440,7 +439,6 @@ class EntosHarness(ProgramHarness):
                             )
                         else:
                             wavefunction[wavefunction_map["restricted"][key]] = entos_results[key]
-            # TODO Add a test in QCEngineRecords
             elif n_channels == 2:
                 wavefunction["restricted"] = False
                 for key in wavefunction_map["unrestricted"].keys():
